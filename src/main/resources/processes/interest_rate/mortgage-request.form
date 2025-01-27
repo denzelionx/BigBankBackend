@@ -1,0 +1,257 @@
+{
+  "components": [
+    {
+      "text": "# Mortgage Request",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_18i19qe",
+        "columns": null
+      },
+      "id": "Field_0v2zw48"
+    },
+    {
+      "components": [
+        {
+          "label": "Requested Mortgage Amount",
+          "type": "number",
+          "layout": {
+            "row": "Row_1lvty12",
+            "columns": null
+          },
+          "id": "Field_1qogmcx",
+          "key": "requestedAmount",
+          "readonly": true
+        },
+        {
+          "label": "House Value",
+          "type": "number",
+          "layout": {
+            "row": "Row_1lvty12",
+            "columns": null
+          },
+          "id": "Field_03zxbgt",
+          "key": "houseValue",
+          "readonly": true
+        },
+        {
+          "label": "Inclusive Risk",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_1dunqqg",
+            "columns": null
+          },
+          "id": "Field_0rt3shg",
+          "key": "inclusiveMortgageRisk",
+          "readonly": true
+        },
+        {
+          "label": "Preposed Interest Rate",
+          "type": "number",
+          "layout": {
+            "row": "Row_1dunqqg",
+            "columns": null
+          },
+          "id": "Field_00c476g",
+          "key": "interestRate",
+          "readonly": true
+        },
+        {
+          "label": "Desired interest rate period",
+          "type": "number",
+          "layout": {
+            "row": "Row_1dunqqg",
+            "columns": null
+          },
+          "id": "Field_0y7z0yh",
+          "key": "desiredInterestRatePeriod",
+          "readonly": true
+        },
+        {
+          "text": "The client is a VIP",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_1ngs3x6",
+            "columns": null
+          },
+          "id": "Field_1xblpv0",
+          "conditional": {
+            "hide": "=vip = false"
+          }
+        },
+        {
+          "text": "The client is not a VIP",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_1ngs3x6",
+            "columns": null
+          },
+          "id": "Field_12ldnhn",
+          "conditional": {
+            "hide": "=vip = true"
+          }
+        },
+        {
+          "label": "Show more mortgage info",
+          "type": "checkbox",
+          "layout": {
+            "row": "Row_1ngs3x6",
+            "columns": 4
+          },
+          "id": "Field_0wjxo9k",
+          "key": "showMoreInfo"
+        },
+        {
+          "label": "Personal Value",
+          "type": "number",
+          "layout": {
+            "row": "Row_0ks3fak",
+            "columns": null
+          },
+          "id": "Field_0glc7pd",
+          "key": "personalValue",
+          "conditional": {
+            "hide": "=showMoreInfo = false"
+          },
+          "readonly": true
+        },
+        {
+          "label": "Sold House Value",
+          "type": "number",
+          "layout": {
+            "row": "Row_0ks3fak",
+            "columns": null
+          },
+          "id": "Field_0f2918o",
+          "key": "soldHouseValue",
+          "readonly": true,
+          "conditional": {
+            "hide": "=(showMoreInfo = false or (soldHouseValue <= 0 or soldHouseValue = null))"
+          },
+          "appearance": {}
+        },
+        {
+          "label": "Age",
+          "type": "number",
+          "layout": {
+            "row": "Row_0ks3fak",
+            "columns": null
+          },
+          "id": "Field_06q7ly7",
+          "key": "age",
+          "readonly": true,
+          "conditional": {
+            "hide": "=showMoreInfo = false"
+          }
+        },
+        {
+          "text": "The client has an indefinite contract ",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_0iw1jip",
+            "columns": null
+          },
+          "id": "Field_1j2vo53",
+          "conditional": {
+            "hide": "=(showMoreInfo = false or indefiniteContract = false)"
+          }
+        },
+        {
+          "text": "The client has a definite contract",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_0iw1jip",
+            "columns": null
+          },
+          "id": "Field_0at13bg",
+          "conditional": {
+            "hide": "=(indefiniteContract = true or selfEmployement = true or showMoreInfo = false)"
+          }
+        },
+        {
+          "text": "The client is self employed",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_0iw1jip",
+            "columns": null
+          },
+          "id": "Field_0l59kw3",
+          "conditional": {
+            "hide": "=(showMoreInfo = false or selfEmployment = false)"
+          }
+        }
+      ],
+      "showOutline": true,
+      "label": "Important Info",
+      "type": "group",
+      "layout": {
+        "row": "Row_1980vzs",
+        "columns": null
+      },
+      "id": "Field_0ysww72"
+    },
+    {
+      "components": [
+        {
+          "values": [
+            {
+              "label": "Interest Rate Approved",
+              "value": "Approved"
+            },
+            {
+              "label": "Interest Rate Rejected",
+              "value": "Rejected"
+            }
+          ],
+          "label": "Employee Decision",
+          "type": "radio",
+          "layout": {
+            "row": "Row_1jepiq0",
+            "columns": null
+          },
+          "id": "Field_0av5p1w",
+          "key": "decision",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "label": "Rejection Reason",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0sfr9mu",
+            "columns": null
+          },
+          "id": "Field_0yp8p17",
+          "key": "rejectionReason",
+          "conditional": {
+            "hide": "=DecisionInfo.companyApproved != \"Rejected\""
+          }
+        }
+      ],
+      "showOutline": true,
+      "label": "Decision Info",
+      "type": "group",
+      "layout": {
+        "row": "Row_0ra65qp",
+        "columns": null
+      },
+      "id": "Field_13lulck",
+      "path": "decisionInfo"
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.4.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.26.0"
+  },
+  "schemaVersion": 16,
+  "id": "Form_IntrestRateRequest",
+  "type": "default"
+}

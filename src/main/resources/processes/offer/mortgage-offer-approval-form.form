@@ -1,0 +1,253 @@
+{
+  "components": [
+    {
+      "text": "# Mortgage Offer",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_08hggib",
+        "columns": null
+      },
+      "id": "Field_1n3m7fg"
+    },
+    {
+      "components": [
+        {
+          "label": "Requested Mortgage Amount",
+          "type": "number",
+          "layout": {
+            "row": "Row_1z0umoc",
+            "columns": null
+          },
+          "id": "Field_06xqqzz",
+          "key": "requestedAmount",
+          "readonly": true
+        },
+        {
+          "label": "House Value",
+          "type": "number",
+          "layout": {
+            "row": "Row_1lb4b0g",
+            "columns": null
+          },
+          "id": "Field_1ponkmu",
+          "key": "houseValue",
+          "readonly": true
+        },
+        {
+          "label": "Agreed Interest Rate",
+          "type": "number",
+          "layout": {
+            "row": "Row_00o6mdh",
+            "columns": null
+          },
+          "id": "Field_19e58yy",
+          "key": "interestRate",
+          "readonly": true
+        },
+        {
+          "label": "Agreed Interest Rate Period",
+          "type": "number",
+          "layout": {
+            "row": "Row_04k5g17",
+            "columns": null
+          },
+          "id": "Field_13q5e2l",
+          "key": "interestRatePeriod",
+          "readonly": true
+        },
+        {
+          "label": "Personal Value",
+          "type": "number",
+          "layout": {
+            "row": "Row_1tcusvx",
+            "columns": null
+          },
+          "id": "Field_0563l5t",
+          "key": "savings",
+          "readonly": true
+        },
+        {
+          "label": "Client Age",
+          "type": "number",
+          "layout": {
+            "row": "Row_1p94gkf",
+            "columns": null
+          },
+          "id": "Field_14qg54d",
+          "key": "clientAge",
+          "readonly": true
+        },
+        {
+          "text": "Client is VIP",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_1sls6d6",
+            "columns": null
+          },
+          "id": "Field_1lgoxxc",
+          "conditional": {
+            "hide": "=vip = false"
+          }
+        },
+        {
+          "text": "Client has indefinite contract",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_0ifge95",
+            "columns": null
+          },
+          "id": "Field_1hfwz4j",
+          "conditional": {
+            "hide": "=indefiniteContract = true"
+          }
+        },
+        {
+          "text": "Client has definite contract",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_0kbiwho",
+            "columns": null
+          },
+          "id": "Field_1xn3910",
+          "conditional": {
+            "hide": "=indefiniteContract = false"
+          }
+        },
+        {
+          "text": "Client is self employed",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_05nkomj",
+            "columns": null
+          },
+          "id": "Field_0xyk80p",
+          "conditional": {
+            "hide": "=selfEmployed = false"
+          }
+        },
+        {
+          "text": "Client name does not match name of current property",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_05n9uki",
+            "columns": null
+          },
+          "id": "Field_0su5ab4",
+          "conditional": {
+            "hide": "=ownerName = customerName"
+          }
+        },
+        {
+          "text": "Client name matches name of current property",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_03a1ltg",
+            "columns": null
+          },
+          "id": "Field_1es6jhw",
+          "conditional": {
+            "hide": "=ownerName != customerName"
+          }
+        },
+        {
+          "text": "BKR rating is negative",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_1n1dnlu",
+            "columns": null
+          },
+          "id": "Field_16othjy",
+          "conditional": {
+            "hide": "=ratingIsPositive = \"positive\""
+          }
+        },
+        {
+          "text": "BKR rating is positive",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_0crm7rm",
+            "columns": null
+          },
+          "id": "Field_0hkz8v7",
+          "conditional": {
+            "hide": "=ratingIsPositive = \"negative\""
+          }
+        }
+      ],
+      "showOutline": true,
+      "label": "Client Information",
+      "type": "group",
+      "layout": {
+        "row": "Row_15g7wvr",
+        "columns": null
+      },
+      "id": "Field_1ph84im"
+    },
+    {
+      "components": [
+        {
+          "values": [
+            {
+              "label": "Approved",
+              "value": "approved"
+            },
+            {
+              "label": "Rejected",
+              "value": "rejected"
+            }
+          ],
+          "label": "Mortgage Decision",
+          "type": "radio",
+          "layout": {
+            "row": "Row_0nya0e1",
+            "columns": null
+          },
+          "id": "Field_0tr69pb",
+          "key": "OfferApproved",
+          "validate": {
+            "required": true
+          }
+        },
+        {
+          "label": "Reason for Rejection",
+          "type": "textarea",
+          "layout": {
+            "row": "Row_1ev9ypl",
+            "columns": null
+          },
+          "id": "Field_1gmnfc2",
+          "key": "rejectionReason",
+          "conditional": {
+            "hide": "=DecisionInfo.companyApproved != \"Rejected\""
+          }
+        }
+      ],
+      "showOutline": true,
+      "label": "Decision Info",
+      "type": "group",
+      "layout": {
+        "row": "Row_0wycu17",
+        "columns": null
+      },
+      "id": "Field_090o3km"
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.4.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.26.0"
+  },
+  "schemaVersion": 16,
+  "id": "mortgage_Offer_Form",
+  "type": "default"
+}

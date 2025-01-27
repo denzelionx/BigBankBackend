@@ -1,0 +1,23 @@
+{
+	"dataDescription": "Mortgage Risk table, value line:2, Inclusive risk table, value line : 2, interest Rate table, value Line : 1",
+	"_comments1": "Starting variables bellow",
+	"oldHouseValue":400000,
+	"oldHouseMortgage":120000,
+	"savings":100000,
+	"yearlyIncome":100000, 
+	"vip":true, 
+	"requestedAmount":800000,
+	"houseValue":700000,
+	"age":26,
+	"selfEmployment":false,
+	"indefiniteContract":true,
+	"desiredInterestRatePeriod":5,
+	"baseRate":5,
+
+	"_comments2": "Expected result variables bellow",
+	"soldHouseValue": 0,
+	"personalValue": 0,
+	"mortgageRisk": "Low",
+	"inclusiveMortgageRisk": "Low",
+	"interestRate": 4.5833
+}

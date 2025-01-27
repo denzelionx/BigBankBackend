@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.26.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.4.0" camunda:diagramRelationId="11611222-2d4c-4d49-a745-062cd9d3139b">
+  <bpmn:process id="Process_RejectionEvaluationProcess" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_RejectionEvaluation">
+      <bpmn:outgoing>Flow_05glqhp</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_05glqhp" sourceRef="StartEvent_RejectionEvaluation" targetRef="Task_EvaluateRejection" />
+    <bpmn:userTask id="Task_EvaluateRejection" name="Evaluate rejection">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="Form_RejectionEvaluation" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=rejectionWasCorrect=&#34;true&#34;" target="rejectionWasCorrect" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_05glqhp</bpmn:incoming>
+      <bpmn:outgoing>Flow_1yo6ejq</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_RejectionEvaluation" name="Rejection was evaluated">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1yo6ejq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1yo6ejq" sourceRef="Task_EvaluateRejection" targetRef="EndEvent_RejectionEvaluation" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_RejectionEvaluationProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_RejectionEvaluation">
+        <dc:Bounds x="150" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0etgxb5_di" bpmnElement="Task_EvaluateRejection">
+        <dc:Bounds x="240" y="78" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0l27s8v_di" bpmnElement="EndEvent_RejectionEvaluation">
+        <dc:Bounds x="382" y="100" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="366" y="143" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_05glqhp_di" bpmnElement="Flow_05glqhp">
+        <di:waypoint x="186" y="118" />
+        <di:waypoint x="240" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1yo6ejq_di" bpmnElement="Flow_1yo6ejq">
+        <di:waypoint x="340" y="118" />
+        <di:waypoint x="382" y="118" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

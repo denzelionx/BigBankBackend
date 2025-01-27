@@ -1,0 +1,29 @@
+# spring-boot-starter-camunda-sdk: 8.5.x
+zeebe:
+  client:
+    cloud:
+      clientId: zeebe
+      clientSecret: zecret
+      authUrl: http://localhost:18080/auth/realms/camunda-platform/protocol/openid-connect/token
+    broker:
+      grpcAddress: http://localhost:26500
+    security:
+      plaintext: true
+
+server:
+  port: 9090
+
+spring:
+  datasource:
+    url: some_url
+    username: some_user
+    password: some_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+sendgrid:
+  api-key: some_key
+  from-email: some_email

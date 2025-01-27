@@ -1,0 +1,99 @@
+{
+  "components": [
+    {
+      "text": "# Verify address",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_033fhoi",
+        "columns": null
+      },
+      "id": "Field_0hix78j"
+    },
+    {
+      "text": "=\"Address that needs verification: \" + address ",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_1nn1gh6",
+        "columns": null
+      },
+      "id": "Field_19ttcmj"
+    },
+    {
+      "values": [
+        {
+          "label": "Yes",
+          "value": "true"
+        },
+        {
+          "label": "No",
+          "value": "false"
+        }
+      ],
+      "label": "Address is correct",
+      "type": "radio",
+      "layout": {
+        "row": "Row_05q9fl6",
+        "columns": null
+      },
+      "id": "Field_005qxn2",
+      "key": "correctAddress"
+    },
+    {
+      "label": "Correct address is:",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1m4bwww",
+        "columns": null
+      },
+      "id": "Field_08pqojn",
+      "key": "address",
+      "conditional": {
+        "hide": "=correctAddress = \"true\" or \"\""
+      }
+    },
+    {
+      "values": [
+        {
+          "label": "Yes",
+          "value": "true"
+        },
+        {
+          "label": "No",
+          "value": "false"
+        }
+      ],
+      "label": "Address has owner",
+      "type": "radio",
+      "layout": {
+        "row": "Row_1f12m3d",
+        "columns": null
+      },
+      "id": "Field_1l3qdkd",
+      "key": "addressExists"
+    },
+    {
+      "label": "Name of owner",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0v2mxh0",
+        "columns": null
+      },
+      "id": "Field_014beaz",
+      "key": "ownerName",
+      "conditional": {
+        "hide": "=addressExists = \"false\""
+      }
+    }
+  ],
+  "type": "default",
+  "id": "OwnerManualVertification",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.26.0"
+  },
+  "schemaVersion": 16
+}

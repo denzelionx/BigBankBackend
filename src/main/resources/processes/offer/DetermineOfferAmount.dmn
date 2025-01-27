@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="DetermineOfferAmount" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.26.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.5.0">
+  <inputData id="InputData_1dns5z9" name="Old House Value" />
+  <inputData id="InputData_1h165yn" name="Personal Savings" />
+  <inputData id="InputData_0bbiumi" name="Income" />
+  <decision id="Decision_0h0pjt6" name="Decision 1">
+    <variable id="InformationItem_00d25bx" name="personalValue" typeRef="number" />
+    <informationRequirement id="InformationRequirement_0q9afqv">
+      <requiredInput href="#InputData_1dns5z9" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_0pt17eo">
+      <requiredInput href="#InputData_1h165yn" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_1k9klhe">
+      <requiredInput href="#InputData_0bbiumi" />
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_1p8cgwy">
+      <text>(oldHouseValue+personalSavings+yearlyIncome) * 2.5</text>
+    </literalExpression>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape id="DMNShape_1t0uc1b" dmnElementRef="InputData_1dns5z9">
+        <dc:Bounds height="45" width="125" x="157" y="238" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_0ocwx28" dmnElementRef="InputData_1h165yn">
+        <dc:Bounds height="45" width="125" x="307" y="238" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_17ui09h" dmnElementRef="InputData_0bbiumi">
+        <dc:Bounds height="45" width="125" x="457" y="238" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_0ss1sw7" dmnElementRef="Decision_0h0pjt6">
+        <dc:Bounds height="80" width="180" x="280" y="100" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_100x5nl" dmnElementRef="InformationRequirement_0q9afqv">
+        <di:waypoint x="220" y="238" />
+        <di:waypoint x="325" y="200" />
+        <di:waypoint x="325" y="180" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_0oxt5sk" dmnElementRef="InformationRequirement_0pt17eo">
+        <di:waypoint x="370" y="238" />
+        <di:waypoint x="370" y="200" />
+        <di:waypoint x="370" y="180" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_19ud336" dmnElementRef="InformationRequirement_1k9klhe">
+        <di:waypoint x="520" y="238" />
+        <di:waypoint x="415" y="200" />
+        <di:waypoint x="415" y="180" />
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

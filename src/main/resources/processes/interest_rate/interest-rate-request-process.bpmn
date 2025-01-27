@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.26.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.4.0" camunda:diagramRelationId="8601f31f-1b2a-4855-bdde-89e19cb59b76">
+  <bpmn:error id="Error_0wmayw2" name="Error_RequestForInformationTimeOut" errorCode="Error_RequestForInformationTimeOut" />
+  <bpmn:escalation id="Escalation_1md5fvv" name="Escalation_AdditionalInfromationTimeout" />
+  <bpmn:message id="Message_0vbji90" name="Message" />
+  <bpmn:collaboration id="Collaboration_10d0sk2" name="Interest Rate Request Process">
+    <bpmn:participant id="Participant_1msa6xv" name="Interest rate request" processRef="Process_InterestRateRequest" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_InterestRateRequest" name="Intrest Rate Request Process" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_1mylk9j">
+      <bpmn:lane id="Lane_System" name="System">
+        <bpmn:flowNodeRef>StartEvent_InterestRate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1ta2f0o</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SendRequestConformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckProvidedClientInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Merger_VerifyRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ClientInformationCompleet</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CallActivity_RequestAdditionalInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CalculateInterestRate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_AdditionalInfoProvided</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_MannuallyReviewRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Connector_SaveReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SetExperationDate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SendBusinessRulesReevaluationRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0bqezh3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_EndWithOffer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_SentToCustomerSupport</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_NotifyRequestRejection</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_EndWithoutOffer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SentInterestRateOfferToClient</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ReferCustomerSupport</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1n8mud7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_00v9dxd</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Connector_OfferSendStatus</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_InterestRateApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_WasInterestRejectionCorrect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1bxgp3l</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_InterestRateRejectionEvaluation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_WasAdditionalInformationRejectionCorrect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CallActivity_AdditionalInformationTimeoutRejectionEvaluationProcess</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Error_RequestVerification</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SeniorFinancialEmployee" name="Senior Financial Employee">
+        <bpmn:flowNodeRef>Task_ApprovalSeniorEmployee</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_FinancialEmployee" name="Financial Employee">
+        <bpmn:flowNodeRef>Gateway_HigherThank750k</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ApprovalEmployee</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Merger_EmployeApproval</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_InterestRate" name="User request form filled in">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=&#34;http://localhost:9091&#34;" target="url" />
+          <zeebe:output source="=&#34;http://localhost:9091/mortgage/request/&#34; + id" target="requestUrl" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1oz2z4k</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="Gateway_1ta2f0o">
+      <bpmn:incoming>Flow_AdditionalInfoProvided</bpmn:incoming>
+      <bpmn:incoming>Flow_10hgx45</bpmn:incoming>
+      <bpmn:outgoing>Flow_08owjtt</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="Task_SendRequestConformation" name="Send request received confirmation">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendMail" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;notifyMortgageRequestReceived&#34;" target="EmailType" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1oz2z4k</bpmn:incoming>
+      <bpmn:outgoing>Flow_10hgx45</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:serviceTask id="Task_CheckProvidedClientInformation" name="Verify request">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="checkProvidedClientInformationWorker" retries="0" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_08owjtt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1c7up1b</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Merger_VerifyRequest">
+      <bpmn:incoming>Flow_1c7up1b</bpmn:incoming>
+      <bpmn:incoming>Flow_0sn2z7d</bpmn:incoming>
+      <bpmn:outgoing>Flow_0y7h2lg</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_ClientInformationCompleet" name="Is request valid?" default="Flow_ClientInformationIncompleet">
+      <bpmn:incoming>Flow_0y7h2lg</bpmn:incoming>
+      <bpmn:outgoing>Flow_ClientInformationIncompleet</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ClientInfromationCompleet</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="CallActivity_RequestAdditionalInformation" name="Request additional information">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_AdditionalInformationRequestProcess" propagateAllChildVariables="true" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ClientInformationIncompleet</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qln7vf</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:callActivity id="Task_CalculateInterestRate" name="Calculate mortgage risk">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_MortgageInterestDecisionProcess" propagateAllChildVariables="true" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ClientInfromationCompleet</bpmn:incoming>
+      <bpmn:outgoing>Flow_16fer18</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="Gateway_AdditionalInfoProvided" name="Additional info provided?">
+      <bpmn:incoming>Flow_0qln7vf</bpmn:incoming>
+      <bpmn:outgoing>Flow_AddtionalInfoNotProvided</bpmn:outgoing>
+      <bpmn:outgoing>Flow_AdditionalInfoProvided</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_MannuallyReviewRequest" name="Manually review request">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="Form_VerifyRequestData" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=if decisionSegment.decision = &#34;approved&#34; then &#34;verified&#34; else &#34;changes-requested&#34;" target="status" />
+          <zeebe:output source="=decisionSegment.feedback" target="feedback" />
+          <zeebe:output source="=false" target="shouldVerificationError" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1jswmij</bpmn:incoming>
+      <bpmn:outgoing>Flow_0nmdc6m</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Connector_SaveReview" name="Save review" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="8" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="PUT" target="method" />
+          <zeebe:input source="http://host.docker.internal:9090/mortgage/request" target="url" />
+          <zeebe:input source="={&#10;  Content-Type: &#34;application/json&#34; &#10;}" target="headers" />
+          <zeebe:input source="20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;id&#34;: id,&#10;  &#34;status&#34;: status,&#10;  &#34;feedback&#34;: feedback,&#10;  &#34;updateBy&#34;: &#34;employee&#34;&#10;}" target="body" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0nmdc6m</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sn2z7d</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_HigherThank750k" name="Requested amount higher than 750K?" default="Flow_HigherThan750K">
+      <bpmn:incoming>Flow_16fer18</bpmn:incoming>
+      <bpmn:outgoing>Flow_LowerThan750K</bpmn:outgoing>
+      <bpmn:outgoing>Flow_HigherThan750K</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_ApprovalEmployee" name="Employee approval">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="=[&#34;Financial Employees&#34;, &#34;Senior Financial Employees&#34;]" />
+        <zeebe:formDefinition formId="Form_IntrestRateRequest" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_LowerThan750K</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xo2799</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_ApprovalSeniorEmployee" name="Senior Employee approval">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="=[&#34;Senior Financial Employees&#34;]" />
+        <zeebe:formDefinition formId="Form_IntrestRateRequest" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_HigherThan750K</bpmn:incoming>
+      <bpmn:outgoing>Flow_1eo259w</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Merger_EmployeApproval">
+      <bpmn:incoming>Flow_0xo2799</bpmn:incoming>
+      <bpmn:incoming>Flow_1eo259w</bpmn:incoming>
+      <bpmn:outgoing>Flow_0cutwtu</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="Task_SetExperationDate" name="Set experation date 2 hours">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="setExperationDateWorker" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0y91iw0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zwfn1a</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sendTask id="Task_SendBusinessRulesReevaluationRequest" name="Send request to re-evaluate business rules">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendMail" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;reevaluateRules&#34;" target="EmailType" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_InterestRateRejectionCorrect</bpmn:incoming>
+      <bpmn:outgoing>Flow_1fpcl89</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:exclusiveGateway id="Gateway_0bqezh3">
+      <bpmn:incoming>Flow_1fpcl89</bpmn:incoming>
+      <bpmn:incoming>Flow_AdditionalInformationRejectionCorrect</bpmn:incoming>
+      <bpmn:outgoing>Flow_1x2mtue</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Event_EndWithOffer" name="End of offer request process Test">
+      <bpmn:incoming>Flow_0e0imxg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="Event_SentToCustomerSupport" name="Sent to customer support">
+      <bpmn:incoming>Flow_1e545re</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="Task_NotifyRequestRejection" name="Notify client of rejection">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendMail" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;notifyMortgageRequestRejection&#34;" target="EmailType" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06ili8u</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gji7u2</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="Event_EndWithoutOffer" name="End Process without offer">
+      <bpmn:incoming>Flow_1gji7u2</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_1e1vfw6" />
+    </bpmn:endEvent>
+    <bpmn:sendTask id="Task_SentInterestRateOfferToClient" name="Send offer to client">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendOfferToClientWorker" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0oza3ba</bpmn:incoming>
+      <bpmn:outgoing>Flow_0e0imxg</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sendTask id="Task_ReferCustomerSupport" name="Refer to customer support">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendMail" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;referCustomerSupport&#34;" target="EmailType" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0qjohb6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1e545re</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:serviceTask id="Activity_1n8mud7" name="Set &#39;rejected&#39; status" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="8" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="PUT" target="method" />
+          <zeebe:input source="http://host.docker.internal:9090/mortgage/request" target="url" />
+          <zeebe:input source="={&#10;  Content-Type: &#34;application/json&#34; &#10;}" target="headers" />
+          <zeebe:input source="20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;id&#34;: id,&#10;  &#34;status&#34;: &#34;rejected&#34;&#10;}" target="body" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" />
+          <zeebe:header key="resultExpression" />
+          <zeebe:header key="errorExpression" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1x2mtue</bpmn:incoming>
+      <bpmn:outgoing>Flow_06ili8u</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_00v9dxd" name="Set &#39;support&#39; status" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="8" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="PUT" target="method" />
+          <zeebe:input source="http://host.docker.internal:9090/mortgage/request" target="url" />
+          <zeebe:input source="={&#10;  Content-Type: &#34;application/json&#34; &#10;}" target="headers" />
+          <zeebe:input source="20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;id&#34;: id,&#10;  &#34;status&#34;: &#34;support-required&#34;&#10;}" target="body" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" />
+          <zeebe:header key="resultExpression" />
+          <zeebe:header key="errorExpression" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_AdditionalInformationRejectionIncorrect</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qjohb6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Connector_OfferSendStatus" name="Set &#39;offer sent&#39; status" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="8" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="PUT" target="method" />
+          <zeebe:input source="http://host.docker.internal:9090/mortgage/request" target="url" />
+          <zeebe:input source="={&#10;  Content-Type: &#34;application/json&#34; &#10;}" target="headers" />
+          <zeebe:input source="20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;id&#34;: id,&#10;  &#34;status&#34;: &#34;offer-sent&#34;&#10;}" target="body" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" />
+          <zeebe:header key="resultExpression" />
+          <zeebe:header key="errorExpression" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0zwfn1a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0oza3ba</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_InterestRateApproved" name="Approved?" default="Flow_InterestRateNotApproved">
+      <bpmn:incoming>Flow_0cutwtu</bpmn:incoming>
+      <bpmn:outgoing>Flow_InterestRateNotApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_InterestRateApproved</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_WasInterestRejectionCorrect" name="Was rejection correct?">
+      <bpmn:incoming>Flow_1dusv4a</bpmn:incoming>
+      <bpmn:outgoing>Flow_InterestRateRejectionCorrect</bpmn:outgoing>
+      <bpmn:outgoing>Flow_InterestRateRejectionIncorrect</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_1bxgp3l">
+      <bpmn:incoming>Flow_InterestRateApproved</bpmn:incoming>
+      <bpmn:incoming>Flow_InterestRateRejectionIncorrect</bpmn:incoming>
+      <bpmn:outgoing>Flow_0y91iw0</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="Task_InterestRateRejectionEvaluation" name="Rejection evaluation process">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_RejectionEvaluationProcess" propagateAllChildVariables="true" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;Interest Rate Request&#34;" target="originProcess" />
+          <zeebe:input source="=&#34;Employee approval&#34;" target="rejectionStep" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_InterestRateNotApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dusv4a</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="Gateway_WasAdditionalInformationRejectionCorrect" name="Was rejection correct?">
+      <bpmn:incoming>Flow_0tvj8bk</bpmn:incoming>
+      <bpmn:outgoing>Flow_AdditionalInformationRejectionIncorrect</bpmn:outgoing>
+      <bpmn:outgoing>Flow_AdditionalInformationRejectionCorrect</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="CallActivity_AdditionalInformationTimeoutRejectionEvaluationProcess" name="Rejection evaluation process">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_RejectionEvaluationProcess" propagateAllChildVariables="true" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;Interest Rate Request&#34;" target="originProcess" />
+          <zeebe:input source="=&#34;Addditional Information Request Timeout&#34;" target="rejectionStep" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_AddtionalInfoNotProvided</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tvj8bk</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:boundaryEvent id="Error_RequestVerification" name="Request verification failure" attachedToRef="Task_CheckProvidedClientInformation">
+      <bpmn:extensionElements />
+      <bpmn:outgoing>Flow_1jswmij</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0ytzdt3" errorRef="Error_0vs5kd9" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1oz2z4k" sourceRef="StartEvent_InterestRate" targetRef="Task_SendRequestConformation" />
+    <bpmn:sequenceFlow id="Flow_AdditionalInfoProvided" name="Yes" sourceRef="Gateway_AdditionalInfoProvided" targetRef="Gateway_1ta2f0o">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=additionalInfoProvided=true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_10hgx45" sourceRef="Task_SendRequestConformation" targetRef="Gateway_1ta2f0o" />
+    <bpmn:sequenceFlow id="Flow_08owjtt" sourceRef="Gateway_1ta2f0o" targetRef="Task_CheckProvidedClientInformation" />
+    <bpmn:sequenceFlow id="Flow_1c7up1b" sourceRef="Task_CheckProvidedClientInformation" targetRef="Merger_VerifyRequest" />
+    <bpmn:sequenceFlow id="Flow_0sn2z7d" sourceRef="Connector_SaveReview" targetRef="Merger_VerifyRequest" />
+    <bpmn:sequenceFlow id="Flow_0y7h2lg" sourceRef="Merger_VerifyRequest" targetRef="Gateway_ClientInformationCompleet" />
+    <bpmn:sequenceFlow id="Flow_ClientInfromationCompleet" name="Yes" sourceRef="Gateway_ClientInformationCompleet" targetRef="Task_CalculateInterestRate">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=status="verified"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ClientInformationIncompleet" name="No" sourceRef="Gateway_ClientInformationCompleet" targetRef="CallActivity_RequestAdditionalInformation" />
+    <bpmn:sequenceFlow id="Flow_0qln7vf" sourceRef="CallActivity_RequestAdditionalInformation" targetRef="Gateway_AdditionalInfoProvided" />
+    <bpmn:sequenceFlow id="Flow_16fer18" sourceRef="Task_CalculateInterestRate" targetRef="Gateway_HigherThank750k" />
+    <bpmn:sequenceFlow id="Flow_AddtionalInfoNotProvided" name="No" sourceRef="Gateway_AdditionalInfoProvided" targetRef="CallActivity_AdditionalInformationTimeoutRejectionEvaluationProcess">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=additionalInfoProvided=false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1jswmij" sourceRef="Error_RequestVerification" targetRef="Task_MannuallyReviewRequest" />
+    <bpmn:sequenceFlow id="Flow_0nmdc6m" sourceRef="Task_MannuallyReviewRequest" targetRef="Connector_SaveReview" />
+    <bpmn:sequenceFlow id="Flow_LowerThan750K" name="No" sourceRef="Gateway_HigherThank750k" targetRef="Task_ApprovalEmployee">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requestedAmount &lt; 750000</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_HigherThan750K" name="Yes" sourceRef="Gateway_HigherThank750k" targetRef="Task_ApprovalSeniorEmployee" />
+    <bpmn:sequenceFlow id="Flow_0xo2799" sourceRef="Task_ApprovalEmployee" targetRef="Merger_EmployeApproval" />
+    <bpmn:sequenceFlow id="Flow_1eo259w" sourceRef="Task_ApprovalSeniorEmployee" targetRef="Merger_EmployeApproval" />
+    <bpmn:sequenceFlow id="Flow_0cutwtu" sourceRef="Merger_EmployeApproval" targetRef="Gateway_InterestRateApproved" />
+    <bpmn:sequenceFlow id="Flow_0y91iw0" sourceRef="Gateway_1bxgp3l" targetRef="Task_SetExperationDate" />
+    <bpmn:sequenceFlow id="Flow_0zwfn1a" sourceRef="Task_SetExperationDate" targetRef="Connector_OfferSendStatus" />
+    <bpmn:sequenceFlow id="Flow_InterestRateRejectionCorrect" name="Rejection was correct" sourceRef="Gateway_WasInterestRejectionCorrect" targetRef="Task_SendBusinessRulesReevaluationRequest">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=rejectionWasCorrect=true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1fpcl89" sourceRef="Task_SendBusinessRulesReevaluationRequest" targetRef="Gateway_0bqezh3" />
+    <bpmn:sequenceFlow id="Flow_AdditionalInformationRejectionCorrect" name="Rejection was correct" sourceRef="Gateway_WasAdditionalInformationRejectionCorrect" targetRef="Gateway_0bqezh3">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=rejectionWasCorrect = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1x2mtue" sourceRef="Gateway_0bqezh3" targetRef="Activity_1n8mud7" />
+    <bpmn:sequenceFlow id="Flow_0e0imxg" sourceRef="Task_SentInterestRateOfferToClient" targetRef="Event_EndWithOffer" />
+    <bpmn:sequenceFlow id="Flow_1e545re" sourceRef="Task_ReferCustomerSupport" targetRef="Event_SentToCustomerSupport" />
+    <bpmn:sequenceFlow id="Flow_06ili8u" sourceRef="Activity_1n8mud7" targetRef="Task_NotifyRequestRejection" />
+    <bpmn:sequenceFlow id="Flow_1gji7u2" sourceRef="Task_NotifyRequestRejection" targetRef="Event_EndWithoutOffer" />
+    <bpmn:sequenceFlow id="Flow_0oza3ba" sourceRef="Connector_OfferSendStatus" targetRef="Task_SentInterestRateOfferToClient" />
+    <bpmn:sequenceFlow id="Flow_0qjohb6" sourceRef="Activity_00v9dxd" targetRef="Task_ReferCustomerSupport" />
+    <bpmn:sequenceFlow id="Flow_AdditionalInformationRejectionIncorrect" name="Rejection was incorrect" sourceRef="Gateway_WasAdditionalInformationRejectionCorrect" targetRef="Activity_00v9dxd">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=rejectionWasCorrect=false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_InterestRateNotApproved" name="No" sourceRef="Gateway_InterestRateApproved" targetRef="Task_InterestRateRejectionEvaluation" />
+    <bpmn:sequenceFlow id="Flow_InterestRateApproved" name="Yes" sourceRef="Gateway_InterestRateApproved" targetRef="Gateway_1bxgp3l">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=decisionInfo.decision = "Approved"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1dusv4a" sourceRef="Task_InterestRateRejectionEvaluation" targetRef="Gateway_WasInterestRejectionCorrect" />
+    <bpmn:sequenceFlow id="Flow_InterestRateRejectionIncorrect" name="Rejection was incorrect" sourceRef="Gateway_WasInterestRejectionCorrect" targetRef="Gateway_1bxgp3l">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=rejectionWasCorrect = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0tvj8bk" sourceRef="CallActivity_AdditionalInformationTimeoutRejectionEvaluationProcess" targetRef="Gateway_WasAdditionalInformationRejectionCorrect" />
+  </bpmn:process>
+  <bpmn:error id="Error_0vs5kd9" name="Error_RequestVerification" errorCode="verification-error" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_10d0sk2">
+      <bpmndi:BPMNShape id="Participant_1msa6xv_di" bpmnElement="Participant_1msa6xv" isHorizontal="true">
+        <dc:Bounds x="155" y="81" width="2180" height="812" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0n5exu8_di" bpmnElement="Lane_FinancialEmployee" isHorizontal="true">
+        <dc:Bounds x="185" y="201" width="2150" height="120" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0zc9csf_di" bpmnElement="Lane_SeniorFinancialEmployee" isHorizontal="true">
+        <dc:Bounds x="185" y="81" width="2150" height="120" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1j4diw9_di" bpmnElement="Lane_System" isHorizontal="true">
+        <dc:Bounds x="185" y="321" width="2150" height="572" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1qlc6dd_di" bpmnElement="StartEvent_InterestRate">
+        <dc:Bounds x="227" y="423" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="201" y="466" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ta2f0o_di" bpmnElement="Gateway_1ta2f0o" isMarkerVisible="true">
+        <dc:Bounds x="440" y="416" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_10cs958" bpmnElement="Task_SendRequestConformation">
+        <dc:Bounds x="305" y="401" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gr67ng_di" bpmnElement="Task_CheckProvidedClientInformation">
+        <dc:Bounds x="540" y="401" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1nhsjag_di" bpmnElement="Merger_VerifyRequest" isMarkerVisible="true">
+        <dc:Bounds x="695" y="416" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1g46gz4_di" bpmnElement="Gateway_ClientInformationCompleet" isMarkerVisible="true">
+        <dc:Bounds x="780" y="416" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="765" y="393" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_063c255_di" bpmnElement="CallActivity_RequestAdditionalInformation">
+        <dc:Bounds x="895" y="681" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1pe72z1_di" bpmnElement="Task_CalculateInterestRate">
+        <dc:Bounds x="895" y="401" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0yy1r3k_di" bpmnElement="Gateway_AdditionalInfoProvided" isMarkerVisible="true">
+        <dc:Bounds x="1030" y="696" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1020" y="659" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0i9z52w_di" bpmnElement="Task_MannuallyReviewRequest">
+        <dc:Bounds x="540" y="541" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jiz8gn_di" bpmnElement="Connector_SaveReview">
+        <dc:Bounds x="670" y="541" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_08nes6o_di" bpmnElement="Gateway_HigherThank750k" isMarkerVisible="true">
+        <dc:Bounds x="1030" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="940" y="250" width="72" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_02ozt3u" bpmnElement="Task_ApprovalEmployee">
+        <dc:Bounds x="1135" y="220" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0u21wdq" bpmnElement="Task_ApprovalSeniorEmployee">
+        <dc:Bounds x="1135" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0hgq6g0_di" bpmnElement="Merger_EmployeApproval" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="235" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1knu5l2_di" bpmnElement="Task_SetExperationDate">
+        <dc:Bounds x="1735" y="401" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1oxh8kj_di" bpmnElement="Task_SendBusinessRulesReevaluationRequest">
+        <dc:Bounds x="1735" y="541" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0bqezh3_di" bpmnElement="Gateway_0bqezh3" isMarkerVisible="true">
+        <dc:Bounds x="1850" y="696" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0k1dt8b_di" bpmnElement="Event_EndWithOffer">
+        <dc:Bounds x="2257" y="423" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2236" y="466" width="79" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_05cx12v_di" bpmnElement="Event_SentToCustomerSupport">
+        <dc:Bounds x="2257" y="803" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2233" y="846" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1p5ncle" bpmnElement="Task_NotifyRequestRejection">
+        <dc:Bounds x="2085" y="681" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1dy7keq_di" bpmnElement="Event_EndWithoutOffer">
+        <dc:Bounds x="2257" y="703" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2244" y="746" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0e0jjmq_di" bpmnElement="Task_SentInterestRateOfferToClient">
+        <dc:Bounds x="2085" y="401" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0rtnmek" bpmnElement="Task_ReferCustomerSupport">
+        <dc:Bounds x="2085" y="781" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1eq2kti" bpmnElement="Activity_1n8mud7">
+        <dc:Bounds x="1935" y="681" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1rwnpu3" bpmnElement="Activity_00v9dxd">
+        <dc:Bounds x="1935" y="781" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_17gdt81" bpmnElement="Connector_OfferSendStatus">
+        <dc:Bounds x="1935" y="401" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ju1a8k_di" bpmnElement="Gateway_InterestRateApproved" isMarkerVisible="true">
+        <dc:Bounds x="1355" y="416" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1353" y="392" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1fwxvde_di" bpmnElement="Gateway_WasInterestRejectionCorrect" isMarkerVisible="true">
+        <dc:Bounds x="1605" y="556" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1597" y="616" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1bxgp3l_di" bpmnElement="Gateway_1bxgp3l" isMarkerVisible="true">
+        <dc:Bounds x="1605" y="416" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1tuwuef_di" bpmnElement="Task_InterestRateRejectionEvaluation">
+        <dc:Bounds x="1450" y="541" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1ifdkme" bpmnElement="Gateway_WasAdditionalInformationRejectionCorrect" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="696" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1262" y="659" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0htnga5" bpmnElement="CallActivity_AdditionalInformationTimeoutRejectionEvaluationProcess">
+        <dc:Bounds x="1135" y="681" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0u1skad_di" bpmnElement="Error_RequestVerification">
+        <dc:Bounds x="572" y="463" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="487" y="486" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1oz2z4k_di" bpmnElement="Flow_1oz2z4k">
+        <di:waypoint x="263" y="441" />
+        <di:waypoint x="305" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jl6bvj_di" bpmnElement="Flow_AdditionalInfoProvided">
+        <di:waypoint x="1055" y="746" />
+        <di:waypoint x="1055" y="821" />
+        <di:waypoint x="465" y="821" />
+        <di:waypoint x="465" y="466" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1021" y="753" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10hgx45_di" bpmnElement="Flow_10hgx45">
+        <di:waypoint x="405" y="441" />
+        <di:waypoint x="440" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08owjtt_di" bpmnElement="Flow_08owjtt">
+        <di:waypoint x="490" y="441" />
+        <di:waypoint x="540" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c7up1b_di" bpmnElement="Flow_1c7up1b">
+        <di:waypoint x="640" y="441" />
+        <di:waypoint x="695" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sn2z7d_di" bpmnElement="Flow_0sn2z7d">
+        <di:waypoint x="720" y="541" />
+        <di:waypoint x="720" y="466" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y7h2lg_di" bpmnElement="Flow_0y7h2lg">
+        <di:waypoint x="745" y="441" />
+        <di:waypoint x="780" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nl3gis_di" bpmnElement="Flow_ClientInfromationCompleet">
+        <di:waypoint x="830" y="441" />
+        <di:waypoint x="895" y="441" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="845" y="423" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gqr6uq_di" bpmnElement="Flow_ClientInformationIncompleet">
+        <di:waypoint x="805" y="466" />
+        <di:waypoint x="805" y="721" />
+        <di:waypoint x="895" y="721" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="812" y="493" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qln7vf_di" bpmnElement="Flow_0qln7vf">
+        <di:waypoint x="995" y="721" />
+        <di:waypoint x="1030" y="721" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16fer18_di" bpmnElement="Flow_16fer18">
+        <di:waypoint x="995" y="441" />
+        <di:waypoint x="1055" y="441" />
+        <di:waypoint x="1055" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fj0mri_di" bpmnElement="Flow_AddtionalInfoNotProvided">
+        <di:waypoint x="1080" y="721" />
+        <di:waypoint x="1135" y="721" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1100" y="703" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jswmij_di" bpmnElement="Flow_1jswmij">
+        <di:waypoint x="590" y="499" />
+        <di:waypoint x="590" y="541" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nmdc6m_di" bpmnElement="Flow_0nmdc6m">
+        <di:waypoint x="640" y="581" />
+        <di:waypoint x="670" y="581" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yfwhyl_di" bpmnElement="Flow_LowerThan750K">
+        <di:waypoint x="1080" y="260" />
+        <di:waypoint x="1135" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1100" y="242" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06r70t1_di" bpmnElement="Flow_HigherThan750K">
+        <di:waypoint x="1055" y="235" />
+        <di:waypoint x="1055" y="140" />
+        <di:waypoint x="1135" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1096" y="123" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xo2799_di" bpmnElement="Flow_0xo2799">
+        <di:waypoint x="1235" y="260" />
+        <di:waypoint x="1270" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1eo259w_di" bpmnElement="Flow_1eo259w">
+        <di:waypoint x="1235" y="140" />
+        <di:waypoint x="1295" y="140" />
+        <di:waypoint x="1295" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cutwtu_di" bpmnElement="Flow_0cutwtu">
+        <di:waypoint x="1295" y="285" />
+        <di:waypoint x="1295" y="441" />
+        <di:waypoint x="1355" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y91iw0_di" bpmnElement="Flow_0y91iw0">
+        <di:waypoint x="1655" y="441" />
+        <di:waypoint x="1735" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zwfn1a_di" bpmnElement="Flow_0zwfn1a">
+        <di:waypoint x="1835" y="441" />
+        <di:waypoint x="1935" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05zyjln_di" bpmnElement="Flow_InterestRateRejectionCorrect">
+        <di:waypoint x="1655" y="581" />
+        <di:waypoint x="1735" y="581" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1653" y="547" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fpcl89_di" bpmnElement="Flow_1fpcl89">
+        <di:waypoint x="1835" y="581" />
+        <di:waypoint x="1875" y="581" />
+        <di:waypoint x="1875" y="696" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fb91xo_di" bpmnElement="Flow_AdditionalInformationRejectionCorrect">
+        <di:waypoint x="1320" y="721" />
+        <di:waypoint x="1850" y="721" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1343" y="687" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x2mtue_di" bpmnElement="Flow_1x2mtue">
+        <di:waypoint x="1900" y="721" />
+        <di:waypoint x="1935" y="721" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e0imxg_di" bpmnElement="Flow_0e0imxg">
+        <di:waypoint x="2185" y="441" />
+        <di:waypoint x="2257" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e545re_di" bpmnElement="Flow_1e545re">
+        <di:waypoint x="2185" y="821" />
+        <di:waypoint x="2257" y="821" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06ili8u_di" bpmnElement="Flow_06ili8u">
+        <di:waypoint x="2035" y="721" />
+        <di:waypoint x="2085" y="721" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gji7u2_di" bpmnElement="Flow_1gji7u2">
+        <di:waypoint x="2185" y="721" />
+        <di:waypoint x="2257" y="721" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0oza3ba_di" bpmnElement="Flow_0oza3ba">
+        <di:waypoint x="2035" y="441" />
+        <di:waypoint x="2085" y="441" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qjohb6_di" bpmnElement="Flow_0qjohb6">
+        <di:waypoint x="2035" y="821" />
+        <di:waypoint x="2085" y="821" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1khxht5_di" bpmnElement="Flow_AdditionalInformationRejectionIncorrect">
+        <di:waypoint x="1295" y="746" />
+        <di:waypoint x="1295" y="821" />
+        <di:waypoint x="1935" y="821" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1353" y="787" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gc73eq_di" bpmnElement="Flow_InterestRateNotApproved">
+        <di:waypoint x="1380" y="466" />
+        <di:waypoint x="1380" y="581" />
+        <di:waypoint x="1450" y="581" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1407" y="564" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l7v3oa_di" bpmnElement="Flow_InterestRateApproved">
+        <di:waypoint x="1405" y="441" />
+        <di:waypoint x="1605" y="441" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1420" y="444" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dusv4a_di" bpmnElement="Flow_1dusv4a">
+        <di:waypoint x="1550" y="581" />
+        <di:waypoint x="1605" y="581" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zw29nx_di" bpmnElement="Flow_InterestRateRejectionIncorrect">
+        <di:waypoint x="1630" y="556" />
+        <di:waypoint x="1630" y="466" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1555" y="497" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tvj8bk_di" bpmnElement="Flow_0tvj8bk">
+        <di:waypoint x="1235" y="721" />
+        <di:waypoint x="1270" y="721" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

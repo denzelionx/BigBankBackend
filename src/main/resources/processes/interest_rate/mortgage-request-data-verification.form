@@ -1,0 +1,180 @@
+{
+  "components": [
+    {
+      "text": "# Mortgage Request",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_18i19qe",
+        "columns": null
+      },
+      "id": "Field_0v2zw48"
+    },
+    {
+      "components": [
+        {
+          "label": "First Name",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0ad73gu",
+            "columns": 8
+          },
+          "id": "Field_0z04r2o",
+          "key": "firstName",
+          "readonly": true
+        },
+        {
+          "label": "Last Name",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0ad73gu",
+            "columns": null
+          },
+          "id": "Field_1b0iuak",
+          "key": "lastName",
+          "readonly": true
+        },
+        {
+          "label": "Age",
+          "type": "number",
+          "layout": {
+            "row": "Row_1elhpea",
+            "columns": 8
+          },
+          "id": "Field_1bmuau0",
+          "key": "age",
+          "readonly": true
+        },
+        {
+          "label": "Email",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_1elhpea",
+            "columns": null
+          },
+          "id": "Field_0ftliai",
+          "key": "email",
+          "readonly": true
+        },
+        {
+          "label": "Phone",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_01x7iyl",
+            "columns": 8
+          },
+          "id": "Field_1wqr1cd",
+          "key": "phone",
+          "readonly": true
+        },
+        {
+          "label": "Address",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_01x7iyl",
+            "columns": null
+          },
+          "id": "Field_0pnplxd",
+          "key": "address",
+          "readonly": true
+        },
+        {
+          "text": "The client is a VIP",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_1ngs3x6",
+            "columns": null
+          },
+          "id": "Field_1xblpv0",
+          "conditional": {
+            "hide": "=vip = false"
+          }
+        },
+        {
+          "text": "The client is not a VIP",
+          "label": "Text view",
+          "type": "text",
+          "layout": {
+            "row": "Row_1ngs3x6",
+            "columns": null
+          },
+          "id": "Field_12ldnhn",
+          "conditional": {
+            "hide": "=vip = true"
+          }
+        }
+      ],
+      "showOutline": true,
+      "label": "Perosnal information",
+      "type": "group",
+      "layout": {
+        "row": "Row_1980vzs",
+        "columns": null
+      },
+      "id": "Field_0ysww72"
+    },
+    {
+      "components": [
+        {
+          "values": [
+            {
+              "label": "Request is valid",
+              "value": "approved"
+            },
+            {
+              "label": "Request is invalid",
+              "value": "rejected"
+            }
+          ],
+          "label": "Employee Decision",
+          "type": "radio",
+          "layout": {
+            "row": "Row_1jepiq0",
+            "columns": null
+          },
+          "id": "Field_0av5p1w",
+          "key": "decision",
+          "validate": {
+            "required": true
+          },
+          "defaultValue": "<none>"
+        },
+        {
+          "label": "Reason",
+          "type": "textfield",
+          "layout": {
+            "row": "Row_0sfr9mu",
+            "columns": null
+          },
+          "id": "Field_0yp8p17",
+          "key": "feedback",
+          "conditional": {
+            "hide": "=decision = \"Rejected\""
+          },
+          "validate": {
+            "required": false
+          }
+        }
+      ],
+      "showOutline": true,
+      "label": "Decision",
+      "type": "group",
+      "layout": {
+        "row": "Row_0ra65qp",
+        "columns": null
+      },
+      "id": "Field_13lulck",
+      "path": "decisionSegment"
+    }
+  ],
+  "type": "default",
+  "id": "Form_VerifyRequestData",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.26.0"
+  },
+  "schemaVersion": 16
+}

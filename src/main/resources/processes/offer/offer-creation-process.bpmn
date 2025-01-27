@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.26.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.4.0" camunda:diagramRelationId="16798b4d-b293-4e75-bb46-ddf23ed9b203">
+  <bpmn:process id="Process_OfferCreation" name="Offerteproces" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_Offer" name="Interest offer accepted">
+      <bpmn:outgoing>Flow_00v3jt5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_00v3jt5" sourceRef="StartEvent_Offer" targetRef="Gateway_0ettwxg" />
+    <bpmn:sequenceFlow id="Flow_AfterGetClientData" sourceRef="Activity_GetClientData" targetRef="Gateway_DataComplete" />
+    <bpmn:serviceTask id="Activity_GetClientData" name="Get Client Data">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="getClientInfoWorker" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ourad3</bpmn:incoming>
+      <bpmn:outgoing>Flow_AfterGetClientData</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_DataComplete" name="Is data complete?">
+      <bpmn:incoming>Flow_AfterGetClientData</bpmn:incoming>
+      <bpmn:outgoing>Flow_DataNotComplete</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DataComplete</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1nnk1wc" sourceRef="Gateway_ParallelDataComplete" targetRef="Activity_CrossReferenceDocs" />
+    <bpmn:sequenceFlow id="Flow_DataNotComplete" name="No" sourceRef="Gateway_DataComplete" targetRef="Activity_RequestAdditional">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=status="unverified"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_AfterJuniorDecision" sourceRef="Activity_DecisionByJunior" targetRef="Gateway_AfterDecision" />
+    <bpmn:exclusiveGateway id="Gateway_Over750K" name="&#62; 750K">
+      <bpmn:incoming>Flow_PassedDetermineAmount</bpmn:incoming>
+      <bpmn:outgoing>Flow_MoreThen750K</bpmn:outgoing>
+      <bpmn:outgoing>Flow_LessThen750K</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_Approval" name="Approved?">
+      <bpmn:incoming>Flow_afterDecision</bpmn:incoming>
+      <bpmn:outgoing>Flow_Declined</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Approved</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_Declined" name="Declined" sourceRef="Gateway_Approval" targetRef="Activity_RejectionEvaluationProcess">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=OfferApproved="rejected"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_MoreThen750K" name="Yes" sourceRef="Gateway_Over750K" targetRef="Activity_DecisionBySenior">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requestedAmount &gt;= 750000</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="Activity_DecisionBySenior" name="Decide on mortgage approval by senior">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="mortgage_Offer_Form" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_MoreThen750K</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rgw8o4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1rgw8o4" sourceRef="Activity_DecisionBySenior" targetRef="Gateway_AfterDecision" />
+    <bpmn:exclusiveGateway id="Gateway_AfterDecision">
+      <bpmn:incoming>Flow_AfterJuniorDecision</bpmn:incoming>
+      <bpmn:incoming>Flow_1rgw8o4</bpmn:incoming>
+      <bpmn:outgoing>Flow_afterDecision</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_afterDecision" sourceRef="Gateway_AfterDecision" targetRef="Gateway_Approval" />
+    <bpmn:sequenceFlow id="Flow_LessThen750K" name="No" sourceRef="Gateway_Over750K" targetRef="Activity_DecisionByJunior">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requestedAmount &lt; 750000</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_AdditionalInfo" name="Additional info &#10;provided?">
+      <bpmn:incoming>Flow_199rv5f</bpmn:incoming>
+      <bpmn:outgoing>Flow_AdditionalInfoNotProvided</bpmn:outgoing>
+      <bpmn:outgoing>Flow_AdditionalInfoProvided</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_Approved" name="Approved" sourceRef="Gateway_Approval" targetRef="Gateway_083spky">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=OfferApproved="approved"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:callActivity id="Activity_RequestAdditional" name="Request additional documents/info">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_AdditionalInformationRequestProcess" propagateAllChildVariables="false" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_DataNotComplete</bpmn:incoming>
+      <bpmn:outgoing>Flow_199rv5f</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_AdditionalInfoNotProvided" name="No" sourceRef="Gateway_AdditionalInfo" targetRef="Activity_1ng6vj5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=additionalInfoProvided=false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:callActivity id="Activity_1ng6vj5" name="Rejection evaluation process">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_RejectionEvaluationProcess" propagateAllChildVariables="false" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_AdditionalInfoNotProvided</bpmn:incoming>
+      <bpmn:outgoing>Flow_16xz3hg</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="Gateway_RejectionAfterInfoNotProvided" name="Was rejection correct">
+      <bpmn:incoming>Flow_16xz3hg</bpmn:incoming>
+      <bpmn:outgoing>Flow_RejectionCorrect</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RejectionIncorrect</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_16xz3hg" sourceRef="Activity_1ng6vj5" targetRef="Gateway_RejectionAfterInfoNotProvided" />
+    <bpmn:sequenceFlow id="Flow_RejectionCorrect" name="Yes" sourceRef="Gateway_RejectionAfterInfoNotProvided" targetRef="Gateway_053u29z">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=RejectionWasCorrect=true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sendTask id="Message_SendRejectionToClient" name="Inform client about rejection">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendMail" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;InformAboutRejection&#34;" target="EmailType" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0nfpd9u</bpmn:incoming>
+      <bpmn:outgoing>Flow_12wjptg</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="Event_EndProcessWithoutOffer" name="Send to customer support for follow up">
+      <bpmn:incoming>Flow_12wjptg</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="Activity_RejectionEvaluationProcess" name="Rejection evaluation process">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="Process_RejectionEvaluationProcess" propagateAllChildVariables="false" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Declined</bpmn:incoming>
+      <bpmn:outgoing>Flow_1f38x3p</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1f38x3p" sourceRef="Activity_RejectionEvaluationProcess" targetRef="Gateway_RejectionUnfounded" />
+    <bpmn:exclusiveGateway id="Gateway_RejectionUnfounded" name="Rejection was unfounded?">
+      <bpmn:incoming>Flow_1f38x3p</bpmn:incoming>
+      <bpmn:outgoing>Flow_RejectionFounded</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RejectionUnfounded</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_RejectionFounded" name="No" sourceRef="Gateway_RejectionUnfounded" targetRef="Gateway_053u29z">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=OfferApproved=false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RejectionUnfounded" name="Yes" sourceRef="Gateway_RejectionUnfounded" targetRef="Gateway_083spky">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=OfferApproved=true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="Activity_DecisionByJunior" name="Decide on mortgage approval">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="mortgage_Offer_Form" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_LessThen750K</bpmn:incoming>
+      <bpmn:outgoing>Flow_AfterJuniorDecision</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_RejectionIncorrect" name="No" sourceRef="Gateway_RejectionAfterInfoNotProvided" targetRef="Event_SendToCustomerService">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=RejectionWasCorrect=false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:manualTask id="Activity_CrossReferenceDocs" name="Cross reference &#34;aangifte inkomstenbelasting&#34; with other salary documents">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_1nnk1wc</bpmn:incoming>
+      <bpmn:outgoing>Flow_PassedInkomstenBelasting</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:serviceTask id="Activity_RetrieveBKR" name="Retrieve BKR files">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="retrieveBKRFiles" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_182o7q6</bpmn:incoming>
+      <bpmn:outgoing>Flow_PassedRetrieveBKR</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0sh36za" sourceRef="Gateway_ParallelDataComplete" targetRef="Activity_GetOwnerName" />
+    <bpmn:sequenceFlow id="Flow_0wa05r7" sourceRef="Gateway_ParallelDataComplete" targetRef="Gateway_RetrieveBKR" />
+    <bpmn:sequenceFlow id="Flow_DataComplete" name="Yes" sourceRef="Gateway_DataComplete" targetRef="Gateway_ParallelDataComplete">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=status="verified"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_PassedInkomstenBelasting" sourceRef="Activity_CrossReferenceDocs" targetRef="Gateway_0yy5jz2" />
+    <bpmn:sequenceFlow id="Flow_02ykepx" sourceRef="Activity_GetOwnerName" targetRef="Gateway_03xtgau" />
+    <bpmn:sequenceFlow id="Flow_PassedRetrieveBKR" sourceRef="Activity_RetrieveBKR" targetRef="Gateway_0yy5jz2" />
+    <bpmn:sequenceFlow id="Flow_056pvks" sourceRef="Gateway_0yy5jz2" targetRef="Activity_DetermineAmount" />
+    <bpmn:parallelGateway id="Gateway_0yy5jz2">
+      <bpmn:incoming>Flow_PassedInkomstenBelasting</bpmn:incoming>
+      <bpmn:incoming>Flow_PassedRetrieveBKR</bpmn:incoming>
+      <bpmn:incoming>Flow_PassedGetOwner</bpmn:incoming>
+      <bpmn:outgoing>Flow_056pvks</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="Gateway_083spky">
+      <bpmn:incoming>Flow_RejectionUnfounded</bpmn:incoming>
+      <bpmn:incoming>Flow_Approved</bpmn:incoming>
+      <bpmn:outgoing>Flow_04y54iw</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_04y54iw" sourceRef="Gateway_083spky" targetRef="Activity_CreateOffer" />
+    <bpmn:exclusiveGateway id="Gateway_0ettwxg">
+      <bpmn:incoming>Flow_00v3jt5</bpmn:incoming>
+      <bpmn:incoming>Flow_AdditionalInfoProvided</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ourad3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1ourad3" sourceRef="Gateway_0ettwxg" targetRef="Activity_GetClientData" />
+    <bpmn:exclusiveGateway id="Gateway_053u29z">
+      <bpmn:incoming>Flow_RejectionFounded</bpmn:incoming>
+      <bpmn:incoming>Flow_RejectionCorrect</bpmn:incoming>
+      <bpmn:outgoing>Flow_0nfpd9u</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0nfpd9u" sourceRef="Gateway_053u29z" targetRef="Message_SendRejectionToClient" />
+    <bpmn:endEvent id="Event_SendToCustomerService" name="Send to customer service for follow up to recieve the missing information">
+      <bpmn:incoming>Flow_RejectionIncorrect</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="Event_SendToNotary" name="Send to notary">
+      <bpmn:incoming>Flow_AfterSendOffer</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_CreateOffer" name="Create Offer">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="createOffer" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=offerAmount" target="offerAmount" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_04y54iw</bpmn:incoming>
+      <bpmn:outgoing>Flow_afterCreateOffer</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_DetermineAmount" name="Determine offer amount">
+      <bpmn:extensionElements>
+        <zeebe:script expression="=(oldHouseValue+savings+yearlyIncome) * 2.5" resultVariable="offerAmount" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_056pvks</bpmn:incoming>
+      <bpmn:outgoing>Flow_PassedDetermineAmount</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_afterCreateOffer" sourceRef="Activity_CreateOffer" targetRef="Message_SendOfferToClient" />
+    <bpmn:sequenceFlow id="Flow_PassedDetermineAmount" sourceRef="Activity_DetermineAmount" targetRef="Gateway_Over750K" />
+    <bpmn:serviceTask id="Activity_GetOwnerName" name="Get owner name from land registry" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="8" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="GET" target="method" />
+          <zeebe:input source="=&#34;http://host.docker.internal:8089/LandRegistry_&#34; + address" target="url" />
+          <zeebe:input source="20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="20" target="readTimeoutInSeconds" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" value="registryResponse" />
+          <zeebe:header key="resultExpression" value="={&#34;ownerName&#34;:body.LandOwnership.ownership}" />
+          <zeebe:header key="errorExpression" value="=if error.code = &#34;404&#34; then bpmnError(&#34;404&#34;, &#34;Got a 404&#34;, {status:error.code, message:error.message})&#10;else null" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0sh36za</bpmn:incoming>
+      <bpmn:outgoing>Flow_02ykepx</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_12wjptg" sourceRef="Message_SendRejectionToClient" targetRef="Event_EndProcessWithoutOffer" />
+    <bpmn:boundaryEvent id="Event_ErrorAddressNotFound" name="Address not found" attachedToRef="Activity_GetOwnerName">
+      <bpmn:outgoing>Flow_AfterOwnerError</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_18drurc" errorRef="Error_1k1l1jv" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_AfterOwnerError" sourceRef="Event_ErrorAddressNotFound" targetRef="Activity_ManualAddress" />
+    <bpmn:sequenceFlow id="Flow_1gszbw9" sourceRef="Activity_ManualAddress" targetRef="Activity_VerifyAddress" />
+    <bpmn:userTask id="Activity_VerifyAddress" name="Verify address in form">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="OwnerManualVertification" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1gszbw9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1003ai9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1003ai9" sourceRef="Activity_VerifyAddress" targetRef="Gateway_03xtgau" />
+    <bpmn:manualTask id="Activity_ManualAddress" name="Determine if address exists">
+      <bpmn:incoming>Flow_AfterOwnerError</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gszbw9</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:sequenceFlow id="Flow_199rv5f" sourceRef="Activity_RequestAdditional" targetRef="Gateway_AdditionalInfo" />
+    <bpmn:sequenceFlow id="Flow_AdditionalInfoProvided" name="Yes" sourceRef="Gateway_AdditionalInfo" targetRef="Gateway_0ettwxg">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=additionalInfoProvided=true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:boundaryEvent id="Event_ErrorUnableToRetrieveFiles" name="Unable to retrieve files" attachedToRef="Activity_RetrieveBKR">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=bkrRatingRetries" target="bkrRatingRetries" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_AfterRetrieveFilesError</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0y5cmms" errorRef="Error_13e5llu" />
+    </bpmn:boundaryEvent>
+    <bpmn:intermediateCatchEvent id="Event_RetryTimer" name="Wait 24 hours">
+      <bpmn:incoming>Flow_bkrRatingRetriesLess</bpmn:incoming>
+      <bpmn:outgoing>Flow_AfterRetryTimer</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0zmzm9m">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_AfterRetrieveFilesError" sourceRef="Event_ErrorUnableToRetrieveFiles" targetRef="Gateway_RetryAfterError" />
+    <bpmn:scriptTask id="Activity_AddLoopScript" name="Add one iteration to loop var">
+      <bpmn:extensionElements>
+        <zeebe:script expression="=bkrRatingRetries + 1" resultVariable="bkrRatingRetries" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_AfterRetryTimer</bpmn:incoming>
+      <bpmn:outgoing>Flow_AfterRetryLoop</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="Gateway_RetryAfterError" name="Retried 3 times?">
+      <bpmn:incoming>Flow_AfterRetrieveFilesError</bpmn:incoming>
+      <bpmn:outgoing>Flow_bkrRatingRetriesLess</bpmn:outgoing>
+      <bpmn:outgoing>Flow_bkrRatingRetriesMore</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_bkrRatingRetriesLess" name="&#60; 3" sourceRef="Gateway_RetryAfterError" targetRef="Event_RetryTimer">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=bkrRatingRetries &lt; 3</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_bkrRatingRetriesMore" name="&#62;= 3" sourceRef="Gateway_RetryAfterError" targetRef="Event_SendMailTechSupport">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=bkrRatingRetries &gt;= 3</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_RetrieveBKR">
+      <bpmn:incoming>Flow_0wa05r7</bpmn:incoming>
+      <bpmn:incoming>Flow_AfterRetryLoop</bpmn:incoming>
+      <bpmn:outgoing>Flow_182o7q6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_182o7q6" sourceRef="Gateway_RetrieveBKR" targetRef="Activity_RetrieveBKR" />
+    <bpmn:endEvent id="Event_EndWithError" name="End process with error">
+      <bpmn:incoming>Flow_AfterTechMail</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0kif6q6" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_AfterTechMail" sourceRef="Event_SendMailTechSupport" targetRef="Event_EndWithError" />
+    <bpmn:intermediateThrowEvent id="Event_SendMailTechSupport" name="Send mail to tech support">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendMail" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;sendTechSupportMail&#34;" target="EmailType" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_bkrRatingRetriesMore</bpmn:incoming>
+      <bpmn:outgoing>Flow_AfterTechMail</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_095j8b2" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:exclusiveGateway id="Gateway_03xtgau">
+      <bpmn:incoming>Flow_02ykepx</bpmn:incoming>
+      <bpmn:incoming>Flow_1003ai9</bpmn:incoming>
+      <bpmn:outgoing>Flow_PassedGetOwner</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_PassedGetOwner" sourceRef="Gateway_03xtgau" targetRef="Gateway_0yy5jz2" />
+    <bpmn:parallelGateway id="Gateway_ParallelDataComplete">
+      <bpmn:incoming>Flow_DataComplete</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wa05r7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0sh36za</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1nnk1wc</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_AfterRetryLoop" sourceRef="Activity_AddLoopScript" targetRef="Gateway_RetrieveBKR" />
+    <bpmn:sequenceFlow id="Flow_AfterRetryTimer" sourceRef="Event_RetryTimer" targetRef="Activity_AddLoopScript" />
+    <bpmn:sendTask id="Message_SendOfferToClient" name="Send offer to client">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="sendMail" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=&#34;sendOfferConfirmation&#34;" target="EmailType" />
+          <zeebe:input source="=offerPdfPath" target="attachmentPath" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_afterCreateOffer</bpmn:incoming>
+      <bpmn:outgoing>Flow_AfterSendOffer</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sequenceFlow id="Flow_AfterSendOffer" sourceRef="Message_SendOfferToClient" targetRef="Event_SendToNotary" />
+  </bpmn:process>
+  <bpmn:escalation id="Escalation_1d8bupt" name="Escalation_1d8bupt" />
+  <bpmn:error id="Error_13e5llu" name="Error_TimeOut" errorCode="UnableToRetrieveFiles" />
+  <bpmn:error id="Error_1k1l1jv" name="Error404" errorCode="404" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_OfferCreation">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_Offer">
+        <dc:Bounds x="172" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="160" y="165" width="63" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1p5tugw_di" bpmnElement="Activity_GetClientData">
+        <dc:Bounds x="380" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0iv8yog_di" bpmnElement="Gateway_DataComplete" isMarkerVisible="true">
+        <dc:Bounds x="525" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="508" y="91" width="88" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0wu0gpo_di" bpmnElement="Gateway_Over750K" isMarkerVisible="true">
+        <dc:Bounds x="1505" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1512" y="91" width="36" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1hufsaf_di" bpmnElement="Gateway_Approval" isMarkerVisible="true">
+        <dc:Bounds x="1895" y="115" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1893" y="91" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1e5xump_di" bpmnElement="Activity_DecisionBySenior">
+        <dc:Bounds x="1620" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0cv32w1_di" bpmnElement="Gateway_AfterDecision" isMarkerVisible="true">
+        <dc:Bounds x="1775" y="115" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0r7lo7o_di" bpmnElement="Gateway_AdditionalInfo" isMarkerVisible="true">
+        <dc:Bounds x="697" y="895" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="687" y="858" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_049boxe_di" bpmnElement="Activity_RequestAdditional">
+        <dc:Bounds x="500" y="880" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mwy8rc_di" bpmnElement="Activity_1ng6vj5">
+        <dc:Bounds x="852" y="880" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_01ebjbn_di" bpmnElement="Gateway_RejectionAfterInfoNotProvided" isMarkerVisible="true">
+        <dc:Bounds x="1267" y="895" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1259" y="858" width="66" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1hldht7_di" bpmnElement="Message_SendRejectionToClient">
+        <dc:Bounds x="2480" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1oij9ee_di" bpmnElement="Event_EndProcessWithoutOffer">
+        <dc:Bounds x="2644" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2618" y="235" width="88" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_022uf4l_di" bpmnElement="Activity_RejectionEvaluationProcess">
+        <dc:Bounds x="2002" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0uss1f0_di" bpmnElement="Gateway_RejectionUnfounded" isMarkerVisible="true">
+        <dc:Bounds x="2157" y="265" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2147" y="325" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0gv78le_di" bpmnElement="Activity_DecisionByJunior">
+        <dc:Bounds x="1620" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1be5ywy_di" bpmnElement="Activity_CrossReferenceDocs">
+        <dc:Bounds x="852" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1rotinw_di" bpmnElement="Activity_RetrieveBKR">
+        <dc:Bounds x="852" y="540" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0s5fn7j_di" bpmnElement="Gateway_0yy5jz2">
+        <dc:Bounds x="1265" y="115" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_083spky_di" bpmnElement="Gateway_083spky" isMarkerVisible="true">
+        <dc:Bounds x="2157" y="115" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0ettwxg_di" bpmnElement="Gateway_0ettwxg" isMarkerVisible="true">
+        <dc:Bounds x="265" y="115" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_053u29z_di" bpmnElement="Gateway_053u29z" isMarkerVisible="true">
+        <dc:Bounds x="2335" y="265" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1losaku_di" bpmnElement="Event_SendToCustomerService">
+        <dc:Bounds x="2644" y="1022" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2618" y="1065" width="88" height="66" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_11hpj8d_di" bpmnElement="Event_SendToNotary">
+        <dc:Bounds x="2644" y="122" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2628" y="103" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1x18oyw_di" bpmnElement="Activity_CreateOffer">
+        <dc:Bounds x="2310" y="100" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_16c45o6_di" bpmnElement="Activity_DetermineAmount">
+        <dc:Bounds x="1360" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dikctu_di" bpmnElement="Activity_GetOwnerName">
+        <dc:Bounds x="852" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_18w4k1i" bpmnElement="Activity_VerifyAddress">
+        <dc:Bounds x="1060" y="400" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_101aiex_di" bpmnElement="Activity_ManualAddress">
+        <dc:Bounds x="930" y="400" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1dubhds_di" bpmnElement="Event_RetryTimer">
+        <dc:Bounds x="1192" y="702" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1177" y="745" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0md6g21_di" bpmnElement="Activity_AddLoopScript">
+        <dc:Bounds x="1330" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1t4ea24_di" bpmnElement="Gateway_RetryAfterError" isMarkerVisible="true">
+        <dc:Bounds x="1045" y="695" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1029" y="755" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1jxkjn3_di" bpmnElement="Gateway_RetrieveBKR" isMarkerVisible="true">
+        <dc:Bounds x="695" y="555" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1i92sxl_di" bpmnElement="Event_EndWithError">
+        <dc:Bounds x="1352" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1329" y="645" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0y14p9w_di" bpmnElement="Event_SendMailTechSupport">
+        <dc:Bounds x="1192" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1168" y="645" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_03xtgau_di" bpmnElement="Gateway_03xtgau" isMarkerVisible="true">
+        <dc:Bounds x="1185" y="265" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_18cr8gu_di" bpmnElement="Gateway_ParallelDataComplete">
+        <dc:Bounds x="695" y="115" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0jcwgp3" bpmnElement="Message_SendOfferToClient">
+        <dc:Bounds x="2480" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1prx99w_di" bpmnElement="Event_ErrorUnableToRetrieveFiles">
+        <dc:Bounds x="882" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="917" y="636" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0d9jj2i_di" bpmnElement="Event_ErrorAddressNotFound">
+        <dc:Bounds x="882" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="915" y="343" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_00v3jt5_di" bpmnElement="Flow_00v3jt5">
+        <di:waypoint x="208" y="140" />
+        <di:waypoint x="265" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nvy54x_di" bpmnElement="Flow_AfterGetClientData">
+        <di:waypoint x="480" y="140" />
+        <di:waypoint x="525" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nnk1wc_di" bpmnElement="Flow_1nnk1wc">
+        <di:waypoint x="745" y="140" />
+        <di:waypoint x="852" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="781" y="81" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0q7vb3v_di" bpmnElement="Flow_DataNotComplete">
+        <di:waypoint x="550" y="165" />
+        <di:waypoint x="550" y="880" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="562" y="218" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o1mj70_di" bpmnElement="Flow_AfterJuniorDecision">
+        <di:waypoint x="1720" y="290" />
+        <di:waypoint x="1800" y="290" />
+        <di:waypoint x="1800" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_156txfj_di" bpmnElement="Flow_Declined">
+        <di:waypoint x="1920" y="165" />
+        <di:waypoint x="1920" y="290" />
+        <di:waypoint x="2002" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1942" y="272" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ak6ubt_di" bpmnElement="Flow_MoreThen750K">
+        <di:waypoint x="1555" y="140" />
+        <di:waypoint x="1620" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1574" y="118" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rgw8o4_di" bpmnElement="Flow_1rgw8o4">
+        <di:waypoint x="1720" y="140" />
+        <di:waypoint x="1775" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15l0ggw_di" bpmnElement="Flow_afterDecision">
+        <di:waypoint x="1825" y="140" />
+        <di:waypoint x="1895" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ou0zml_di" bpmnElement="Flow_LessThen750K">
+        <di:waypoint x="1530" y="165" />
+        <di:waypoint x="1530" y="290" />
+        <di:waypoint x="1620" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1542" y="172" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0r26rsg_di" bpmnElement="Flow_Approved">
+        <di:waypoint x="1945" y="140" />
+        <di:waypoint x="2157" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1968" y="123" width="47" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1g7rmmy_di" bpmnElement="Flow_AdditionalInfoNotProvided">
+        <di:waypoint x="747" y="920" />
+        <di:waypoint x="852" y="920" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="772" y="902" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16xz3hg_di" bpmnElement="Flow_16xz3hg">
+        <di:waypoint x="952" y="920" />
+        <di:waypoint x="1267" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_130khcx_di" bpmnElement="Flow_RejectionCorrect">
+        <di:waypoint x="1317" y="920" />
+        <di:waypoint x="2360" y="920" />
+        <di:waypoint x="2360" y="315" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1333" y="902" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f38x3p_di" bpmnElement="Flow_1f38x3p">
+        <di:waypoint x="2102" y="290" />
+        <di:waypoint x="2157" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sij0jq_di" bpmnElement="Flow_RejectionFounded">
+        <di:waypoint x="2207" y="290" />
+        <di:waypoint x="2335" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2219" y="272" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1d7pft8_di" bpmnElement="Flow_RejectionUnfounded">
+        <di:waypoint x="2182" y="265" />
+        <di:waypoint x="2182" y="165" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2158" y="204" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15bhwvq_di" bpmnElement="Flow_RejectionIncorrect">
+        <di:waypoint x="1292" y="945" />
+        <di:waypoint x="1292" y="1040" />
+        <di:waypoint x="2644" y="1040" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1300" y="955" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sh36za_di" bpmnElement="Flow_0sh36za">
+        <di:waypoint x="720" y="165" />
+        <di:waypoint x="720" y="290" />
+        <di:waypoint x="852" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="759" y="332" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wa05r7_di" bpmnElement="Flow_0wa05r7">
+        <di:waypoint x="720" y="165" />
+        <di:waypoint x="720" y="555" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="692" y="442" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f5ik93_di" bpmnElement="Flow_DataComplete">
+        <di:waypoint x="575" y="140" />
+        <di:waypoint x="695" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="626" y="122" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ya9a0x_di" bpmnElement="Flow_PassedInkomstenBelasting">
+        <di:waypoint x="952" y="140" />
+        <di:waypoint x="1265" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02ykepx_di" bpmnElement="Flow_02ykepx">
+        <di:waypoint x="952" y="290" />
+        <di:waypoint x="1185" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ezgjg1_di" bpmnElement="Flow_PassedRetrieveBKR">
+        <di:waypoint x="952" y="580" />
+        <di:waypoint x="1290" y="580" />
+        <di:waypoint x="1290" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_056pvks_di" bpmnElement="Flow_056pvks">
+        <di:waypoint x="1315" y="140" />
+        <di:waypoint x="1360" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04y54iw_di" bpmnElement="Flow_04y54iw">
+        <di:waypoint x="2207" y="140" />
+        <di:waypoint x="2310" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ourad3_di" bpmnElement="Flow_1ourad3">
+        <di:waypoint x="315" y="140" />
+        <di:waypoint x="380" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nfpd9u_di" bpmnElement="Flow_0nfpd9u">
+        <di:waypoint x="2385" y="290" />
+        <di:waypoint x="2480" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18gblkd_di" bpmnElement="Flow_afterCreateOffer">
+        <di:waypoint x="2410" y="140" />
+        <di:waypoint x="2480" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11at3ph_di" bpmnElement="Flow_PassedDetermineAmount">
+        <di:waypoint x="1460" y="140" />
+        <di:waypoint x="1505" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12wjptg_di" bpmnElement="Flow_12wjptg">
+        <di:waypoint x="2580" y="290" />
+        <di:waypoint x="2644" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fwvbub_di" bpmnElement="Flow_AfterOwnerError">
+        <di:waypoint x="900" y="348" />
+        <di:waypoint x="900" y="440" />
+        <di:waypoint x="930" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gszbw9_di" bpmnElement="Flow_1gszbw9">
+        <di:waypoint x="1030" y="440" />
+        <di:waypoint x="1060" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1003ai9_di" bpmnElement="Flow_1003ai9">
+        <di:waypoint x="1160" y="440" />
+        <di:waypoint x="1210" y="440" />
+        <di:waypoint x="1210" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_199rv5f_di" bpmnElement="Flow_199rv5f">
+        <di:waypoint x="600" y="920" />
+        <di:waypoint x="697" y="920" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11inxan_di" bpmnElement="Flow_AdditionalInfoProvided">
+        <di:waypoint x="722" y="945" />
+        <di:waypoint x="722" y="1040" />
+        <di:waypoint x="290" y="1040" />
+        <di:waypoint x="290" y="165" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="681" y="955" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1em70hc_di" bpmnElement="Flow_AfterRetrieveFilesError">
+        <di:waypoint x="900" y="638" />
+        <di:waypoint x="900" y="720" />
+        <di:waypoint x="1045" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0k8t9t0_di" bpmnElement="Flow_bkrRatingRetriesLess">
+        <di:waypoint x="1095" y="720" />
+        <di:waypoint x="1192" y="720" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1123" y="703" width="16" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1k6ttec_di" bpmnElement="Flow_bkrRatingRetriesMore">
+        <di:waypoint x="1070" y="695" />
+        <di:waypoint x="1070" y="620" />
+        <di:waypoint x="1192" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1078" y="673" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_182o7q6_di" bpmnElement="Flow_182o7q6">
+        <di:waypoint x="745" y="580" />
+        <di:waypoint x="852" y="580" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00xmu5u_di" bpmnElement="Flow_AfterTechMail">
+        <di:waypoint x="1228" y="620" />
+        <di:waypoint x="1352" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dwiuar_di" bpmnElement="Flow_PassedGetOwner">
+        <di:waypoint x="1235" y="290" />
+        <di:waypoint x="1290" y="290" />
+        <di:waypoint x="1290" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03ht6yt_di" bpmnElement="Flow_AfterRetryLoop">
+        <di:waypoint x="1380" y="760" />
+        <di:waypoint x="1380" y="820" />
+        <di:waypoint x="720" y="820" />
+        <di:waypoint x="720" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0eic6pb_di" bpmnElement="Flow_AfterRetryTimer">
+        <di:waypoint x="1228" y="720" />
+        <di:waypoint x="1330" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tj6ftj_di" bpmnElement="Flow_AfterSendOffer">
+        <di:waypoint x="2580" y="140" />
+        <di:waypoint x="2644" y="140" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
